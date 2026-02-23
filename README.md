@@ -33,7 +33,8 @@ The pattern works as follows:
 ## 🛠️ Tools & Technologies
 - **LUA** – Original code for IQ Option indicators  
 - **MetaTrader 5** – Extract historical market data (EUR/USD)  
-- **Python** – Backtesting simulation  
+- **Python** – Backtesting simulation
+- **Tableau** - Visualization
 
 > No additional Python libraries required.
 
