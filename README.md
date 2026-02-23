@@ -73,8 +73,7 @@ binary-options-candle-pattern/
 │   └── backtest.py                # Script to simulate the pattern
 │
 ├── data/
-│   └── raw/
-│       └── data_binary.csv        # Original historical data (from MetaTrader 5)
+│   └── data_binary.csv        # Original historical data (from MetaTrader 5)
 │
 ├── results/
 │   └── tableau_dashboard.png      # Dashboard image summarizing results
