@@ -1,19 +1,31 @@
-⚠️ Work in progress
+⚠️ Work in Progress
 
 # 📊 Binary Options Candle Pattern Analysis
 
 ## 📌 Project Overview
-This project tests and analyzes a specific **candlestick pattern** to evaluate its effectiveness in **binary options trading**.  
-The goal is to determine **pattern reliability, success rate, and trading signals** to support data-driven trading strategies.
+This project tests and analyzes a specific **candlestick pattern** designed for **binary options trading**.  
+
+> ⚡ **Strategy designed by me**, originally implemented in **LUA**, the scripting language used for custom indicators in IQ Option.  
+
+The goal is to **evaluate the effectiveness of the pattern** using historical market data and a **Python backtesting script**, providing insights for data-driven trading decisions.
+
+---
+
+## 🔹 Pattern Explanation
+The pattern focuses on **Bullish and Bearish Pin Bars**:  
+
+- **Bullish Pin Bar**: Indicates a potential upward reversal. Typically forms after a downtrend with a long lower wick and small body.  
+- **Bearish Pin Bar**: Indicates a potential downward reversal. Typically forms after an uptrend with a long upper wick and small body.  
+
+> This logic is implemented in **LUA** for IQ Option, and the Python script reproduces it for backtesting.
 
 ---
 
 ## 🛠️ Tools & Technologies
-- Python (data analysis and backtesting)
-- Pandas & NumPy (data manipulation)
-- Matplotlib & Seaborn (visualization)
-- Jupyter Notebook (interactive analysis)
-- Optional: Backtrader / TA-Lib (technical analysis indicators)
+- **LUA** – Original code for IQ Option indicators  
+- **Python** – Backtesting simulation  
+
+> No additional libraries required.
 
 ---
 
@@ -21,37 +33,20 @@ The goal is to determine **pattern reliability, success rate, and trading signal
 
 | Metric | Value |
 |--------|-------|
-| **Pattern Tested** | Bullish/Bearish Pin Bar (example) |
-| **Number of Trades Simulated** | 500 |
+| **Pattern Tested** | Bullish/Bearish Pin Bar |
+| **Total Trades Simulated** | 500 |
 | **Win Rate** | 0–100% (to be determined) |
 | **Average Payout per Trade** | TBD |
 
 ---
 
-## 🔍 Key Insights
+## 📊 Results Dashboard
+![Candle Pattern Dashboard](results/dashboard_example.png)
 
-### 🥇 Pattern Performance
-- **Bullish Pattern** shows potential in uptrend markets.
-- **Bearish Pattern** performs best during consolidation periods.
-
-➡️ Early results indicate the pattern may be **profitable with strict risk management**.
-
----
-
-### 📊 Timeframe Analysis
-- Pattern effectiveness varies by **1-minute, 5-minute, and 15-minute charts**.
-- Shorter timeframes may produce more false signals; longer timeframes are more reliable.
-
----
-
-### 💹 Risk & Reward
-- The strategy includes **stop-loss and take-profit rules**.
-- Risk-adjusted metrics help determine **optimal trade sizing**.
-
----
-
-## 📊 Dashboard / Visualization Preview
-![Candle Pattern Chart](charts/candle_pattern_example.png)
+This dashboard summarizes:  
+- Pattern visualization  
+- Simulation requirements  
+- Total trades and success rate  
 
 ---
 
@@ -60,19 +55,16 @@ The goal is to determine **pattern reliability, success rate, and trading signal
 ```bash
 binary-options-candle-pattern/
 │
-├── notebooks/
-│   ├── candle_pattern_backtest.ipynb
+├── lua/
+│   └── candle_pattern.lua         # Original LUA code for IQ Option
 │
-├── scripts/
-│   ├── data_loader.py
-│   ├── pattern_detector.py
-│   ├── backtest_engine.py
+├── python/
+│   └── backtest.py                # Script to simulate the pattern
 │
 ├── data/
-│   ├── sample_ohlc.csv
-│   ├── historical_data.csv
+│   └── raw/                       # Original historical data CSVs
 │
-├── charts/
-│   ├── candle_pattern_example.png
+├── results/
+│   └── dashboard_example.png      # Dashboard image summarizing results
 │
 └── README.md
