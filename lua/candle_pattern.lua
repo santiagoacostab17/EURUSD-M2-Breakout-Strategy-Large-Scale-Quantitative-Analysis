@@ -6,7 +6,7 @@ instrument {
       color_resistance = "red"
       color_support = "green"
       Mid = close[1] - open[1]
-      if open[1] > Mid then Mid = open[1] - close[1] end
+      if open[1] > close[1] then Mid = open[1] - close[1] end
       Mecha_Top = high[1] - close[1]
       if open[1] > close[1] then Mecha_Top = high[1] - open[1] end
       Mecha_Bot = close[1] - low[1]
