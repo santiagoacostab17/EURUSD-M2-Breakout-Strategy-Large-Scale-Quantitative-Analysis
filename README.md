@@ -48,7 +48,7 @@ The pattern works as follows:
 
 ---
 
-## 📊 Results Visualizations
+## 📊 Patterns used
 
 ### Bullish Scenario
 ![Bullish Scenario](results/bullish_scenario.png)  
