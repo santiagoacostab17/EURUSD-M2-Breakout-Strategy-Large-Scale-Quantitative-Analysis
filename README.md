@@ -38,6 +38,9 @@ The pattern works as follows:
 
 ## 📈 Key Metrics
 
+
+| Metric | Value |
+|--------|-------|
 | **Pattern Tested** | Pullback after Breakout |
 | **Total Trades Simulated** | 2,252 |
 | **Wins** | 1,833 |
