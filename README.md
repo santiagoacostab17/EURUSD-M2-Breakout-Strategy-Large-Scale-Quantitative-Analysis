@@ -11,6 +11,9 @@ This project tests a structural breakout strategy on EURUSD using:
 
 The goal is to evaluate whether a strong breakout followed by a pullback generates a statistical edge in short-term binary-style execution.
 
+> **Data Source:** The raw M1 EURUSD data (2015–2021) was obtained from [Kaggle – Forex EURUSD 1m Data](https://www.kaggle.com/datasets/ankitjha420/forex-eurusd-1m-data-2015-to-2021).  
+> Annual CSVs were downloaded individually, merged, cleaned, and chronologically sorted manually to ensure data integrity.
+
 ---
 
 # 🧠 Strategy Logic
@@ -69,6 +72,8 @@ These diagrams represent the structural conditions tested in the backtest.
 | Backtest Type | Vectorized |
 | Lookahead Bias | Removed |
 | Execution | First minute of next M2 |
+| Data Source | Kaggle (2015–2021) |
+| Cleaning & Merging | Performed manually to ensure continuity |
 
 ---
 
@@ -117,7 +122,7 @@ The hypothesis of immediate continuation after structural breakout is not suppor
 
 # 🎯 Key Takeaways
 
-✔ Large dataset validation (3M+ candles) 
+✔ Large dataset validation (3M+ candles)  
 ✔ 50k+ trades → statistically meaningful  
 ✔ Clean vectorized implementation  
 ✔ No overfitting  
