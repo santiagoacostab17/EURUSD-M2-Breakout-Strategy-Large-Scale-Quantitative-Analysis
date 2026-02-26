@@ -1,92 +1,139 @@
 import pandas as pd
 
-# -----------------------------
-# 1️⃣ Read CSV and prepare data
-# -----------------------------
-df = pd.read_csv("data_binary.csv", sep="\t")
-df.columns = ["date","time","open","high","low","close","tickvol","vol","spread"]
+print("\n===== START BACKTEST =====\n")
 
-df["datetime"] = pd.to_datetime(df["date"] + " " + df["time"])
-df = df.sort_values("datetime").reset_index(drop=True)
+# -----------------------------
+# 1️⃣ Read CSV (M1 data)
+# -----------------------------
+print("Loading M1 data...")
 
-for col in ["open","high","low","close"]:
+df = pd.read_csv("EURUSD_1m_completo.csv")
+
+df['datetime'] = pd.to_datetime(
+    df['datetime'],
+    format="%d.%m.%Y %H:%M:%S.%f"
+)
+
+df = df.sort_values('datetime').reset_index(drop=True)
+
+for col in ["open", "high", "low", "close"]:
     df[col] = df[col].astype(float)
 
-# -----------------------------
-# 2️⃣ Build 1-minute candles from 30s data
-# -----------------------------
-df['group_1m'] = df.index // 2  # every 2 candles of 30s = 1 candle of 1 minute
+print("M1 data loaded")
+print("Total M1 candles:", len(df))
 
-df_1m = df.groupby('group_1m').agg({
+# -----------------------------
+# 2️⃣ Build 2-minute candles (M2)
+# -----------------------------
+print("\nBuilding M2 candles...")
+
+df['group_2m'] = df.index // 2
+
+df_2m = df.groupby('group_2m').agg({
     'datetime': 'first',
     'open': 'first',
     'high': 'max',
     'low': 'min',
-    'close': 'last',
-    'tickvol': 'sum',
-    'vol': 'sum',
-    'spread': 'mean'
+    'close': 'last'
 }).reset_index(drop=True)
 
-# -----------------------------
-# 3️⃣ Calculate body and wicks in 1-minute candles
-# -----------------------------
-df_1m['body'] = abs(df_1m['close'] - df_1m['open'])
-df_1m['wick_top'] = df_1m['high'] - df_1m[['open','close']].max(axis=1)
-df_1m['wick_bot'] = df_1m[['open','close']].min(axis=1) - df_1m['low']
+print("M2 candles created")
+print("Total M2 candles:", len(df_2m))
 
 # -----------------------------
-# 4️⃣ Detect strong candles
+# 3️⃣ Calculate body and wicks
 # -----------------------------
-df_1m['bull_strong'] = (
-    (df_1m['close'] > df_1m['open']) &
-    (df_1m['body'] > df_1m['wick_top']) &
-    (df_1m['body'] > df_1m['wick_bot']) &
-    (df_1m['close'] > df_1m['high'].shift(1))
+print("\nCalculating candle structure...")
+
+df_2m['top_wick'] = df_2m['high'] - df_2m[['close','open']].max(axis=1)
+df_2m['bot_wick'] = df_2m[['close','open']].min(axis=1) - df_2m['low']
+df_2m['body'] = (df_2m['close'] - df_2m['open']).abs()
+
+print("Structure calculated")
+
+# -----------------------------
+# 4️⃣ Detect pattern
+# -----------------------------
+print("\nDetecting patterns...")
+
+df_2m['bull_pattern'] = (
+    (df_2m['close'] > df_2m['open']) &
+    (df_2m['top_wick'] < df_2m['body']) &
+    (df_2m['bot_wick'] < df_2m['body']) &
+    (df_2m['close'] > df_2m['high'].shift(1))
 )
 
-df_1m['bear_strong'] = (
-    (df_1m['close'] < df_1m['open']) &
-    (df_1m['body'] > df_1m['wick_top']) &
-    (df_1m['body'] > df_1m['wick_bot']) &
-    (df_1m['close'] < df_1m['low'].shift(1))
+df_2m['bear_pattern'] = (
+    (df_2m['close'] < df_2m['open']) &
+    (df_2m['top_wick'] < df_2m['body']) &
+    (df_2m['bot_wick'] < df_2m['body']) &
+    (df_2m['close'] < df_2m['low'].shift(1))
 )
 
+df_2m = df_2m.dropna().reset_index(drop=True)
+
+bull_count = df_2m['bull_pattern'].sum()
+bear_count = df_2m['bear_pattern'].sum()
+
+print("Patterns detected")
+print("Total bull patterns:", bull_count)
+print("Total bear patterns:", bear_count)
+print("Total patterns:", bull_count + bear_count)
+
 # -----------------------------
-# 5️⃣ Simulate trades (entry in the first half of candle[i+1])
+# 5️⃣ Simulate trades
 # -----------------------------
+print("\nSimulating trades...")
+
 wins = 0
 losses = 0
+total_trades = 0
 
-for i in range(1, len(df_1m)-1):
-    # index of the first 30s candle of the next 1-minute candle (i+1)
-    idx_first_30s_next_1m = (i+1)*2 - 1
-    first_30s_next = df.loc[idx_first_30s_next_1m]
+for i in range(1, len(df_2m) - 1):
 
-    # Bullish entry
-    if df_1m.loc[i, 'bull_strong']:
-        if first_30s_next['low'] <= df_1m.loc[i, 'open']:
-            next_1m_close = df_1m.loc[i+1, 'close']
-            if next_1m_close > df_1m.loc[i, 'open']:
+    entry_m1_index = (i + 1) * 2
+
+    if entry_m1_index >= len(df):
+        continue
+
+    first_minute_next_2m = df.iloc[entry_m1_index]
+
+    entry_price = df_2m.loc[i, 'open']
+    next_2m_close = df_2m.loc[i + 1, 'close']
+
+    if df_2m.loc[i, 'bull_pattern']:
+
+        if first_minute_next_2m['low'] < entry_price:
+
+            total_trades += 1
+
+            if next_2m_close >= entry_price:
                 wins += 1
             else:
                 losses += 1
 
-    # Bearish entry
-    if df_1m.loc[i, 'bear_strong']:
-        if first_30s_next['high'] >= df_1m.loc[i, 'open']:
-            next_1m_close = df_1m.loc[i+1, 'close']
-            if next_1m_close < df_1m.loc[i, 'open']:
+    elif df_2m.loc[i, 'bear_pattern']:
+
+        if first_minute_next_2m['high'] > entry_price:
+
+            total_trades += 1
+
+            if next_2m_close <= entry_price:
                 wins += 1
             else:
                 losses += 1
+
+print("Trade simulation completed")
 
 # -----------------------------
 # 6️⃣ Results
 # -----------------------------
-total = wins + losses
-print("\n----- RESULTS -----")
-print("Total trades:", total)
+winrate = wins / total_trades if total_trades > 0 else 0
+
+print("\n------ RESULTS ------")
 print("Wins:", wins)
 print("Losses:", losses)
-print("Winrate:", round(wins/total*100,2) if total>0 else 0, "%")
+print("Total trades:", total_trades)
+print("Winrate:", round(winrate * 100, 2), "%")
+
+print("\n===== END BACKTEST =====\n")
