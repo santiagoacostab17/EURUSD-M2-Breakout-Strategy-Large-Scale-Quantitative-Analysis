@@ -1,4 +1,4 @@
-# 📊 Data-Driven Trading Strategy Evaluation
+# 📊 Trading Profit Patterns
 
 ## 📌 Executive Summary
 This repository presents a **large-scale quantitative analysis of high-frequency EURUSD price data**, focusing on **pattern detection and short-term trend evaluation**.
